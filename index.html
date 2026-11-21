@@ -436,7 +436,9 @@ let d=document.createElement("div");d.className="product";
 
 
 
-d.innerHTML="<strong>"+escapeText(p.name)+"</strong><br><span class='muted'>Toplam: "+p.stock+" yumurta · Açık: "+p.loose+" · Koli 20'li: "+p.cartons20+" · Koli 30'lu: "+p.cartons30+" · Paketli 20'li: "+(p.packaged20||0)+" · Paketli 30'lu: "+(p.packaged30||0)+"</span>";
+let totalPackages=(p.cartons20||0)+(p.cartons30||0)+(p.packaged20||0)+(p.packaged30||0);
+
+d.innerHTML="<strong>"+escapeText(p.name)+"</strong><br><span class='muted'>Toplam: "+totalPackages+" koli/paket</span>";
 
 
 let del=document.createElement("button");
