@@ -199,6 +199,18 @@ nav button{font-size:13px;padding:12px 4px}
 
 </div>
 
+
+<div class="card">
+
+<h2>Stok Hareketleri Geçmişi</h2>
+
+<div id="historyList">
+
+<p class="muted">Henüz işlem bulunmuyor.</p>
+
+</div>
+
+</div>
 <div class="card">
 
 <h2>Veri Yedekleme</h2>
@@ -415,6 +427,34 @@ let o=document.createElement("option");o.value=i;o.textContent=p.name;$("which")
 
 $("total").textContent=data.products.reduce((s,p)=>s+p.stock,0);
 
+
+$("historyList").innerHTML="";
+
+data.moves.slice().reverse().forEach(m=>{
+
+let type=m.packageType==="packaged"?"Paketli":"Koli";
+
+let size=m.package==="20"?"20'li":"30'lu";
+
+let count=m.packageCount || Math.round(m.qty/(m.package==="20"?20:30));
+
+let date=new Date(m.date).toLocaleString("tr-TR");
+
+let item=document.createElement("div");
+
+item.className="product";
+
+item.innerHTML="<strong>"+(m.kind==="in"?"ALIŞ":"SATIŞ")+"</strong><br>"+
+
+escapeText(m.product)+" · "+type+" · "+size+
+
+"<br>"+count+" koli · "+m.qty+" yumurta"+
+
+"<br><span class='muted'>"+date+"</span>";
+
+$("historyList").appendChild(item);
+
+});
 let today=new Date().toDateString();
 
 $("daily").textContent=data.moves.filter(m=>m.kind==="out"&&new Date(m.date).toDateString()===today).reduce((s,m)=>s+m.qty,0);
