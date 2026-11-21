@@ -231,7 +231,69 @@ function show(id){
 
 }
 
+function addProduct(){
 
+let n=$("pname").value.trim().toLocaleUpperCase("tr-TR");
+
+let loose=Number($("pLoose").value);
+
+let c20=Number($("p20").value);
+
+let c30=Number($("p30").value);
+
+if(!n){
+
+alert("Ürün adı girin.");
+
+return;
+
+}
+
+if(![loose,c20,c30].every(x=>Number.isInteger(x)&&x>=0)){
+
+alert("Stok miktarlarını sıfır veya pozitif tam sayı girin.");
+
+return;
+
+}
+
+if(data.products.some(p=>p.name===n)){
+
+alert("Bu ürün zaten kayıtlı.");
+
+return;
+
+}
+
+let stock=loose+(c20*20)+(c30*30);
+
+data.products.push({
+
+name:n,
+
+stock:stock,
+
+loose:loose,
+
+cartons20:c20,
+
+cartons30:c30
+
+});
+
+$("pname").value="";
+
+$("pLoose").value=0;
+
+$("p20").value=0;
+
+$("p30").value=0;
+
+save();
+
+alert("Ürün ve başlangıç stokları kaydedildi.");
+
+}
 
 function moveStock(){
 
