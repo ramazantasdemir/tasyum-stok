@@ -173,11 +173,19 @@ nav button{font-size:13px;padding:12px 4px}
 
 <select id="which"></select>
 
+<select id="packageType">
+
+<option value="carton">Koli</option>
+
+<option value="packaged">Paketli</option>
+
+</select>
+
 <select id="package">
 
-<option value="20">20'li koli</option>
+<option value="20">20'li</option>
 
-<option value="30">30'lu koli</option>
+<option value="30">30'lu</option>
 
 </select>
 
@@ -301,6 +309,8 @@ alert("Ürün ve başlangıç stokları kaydedildi.");
 
 
 
+
+
 function moveStock(){
 
 let i=Number($("which").value);
@@ -310,6 +320,8 @@ let q=Number($("qty").value);
 let kind=$("kind").value;
 
 let pack=$("package").value;
+
+let packageType=$("packageType").value;
 
 if(!data.products[i] || !Number.isInteger(q) || q<1){
 
@@ -325,31 +337,33 @@ let eggs=pack==="20"?20:30;
 
 let total=q*eggs;
 
-if(kind==="out"){
+let stockField;
 
-let available=pack==="20"?p.cartons20:p.cartons30;
+if(packageType==="carton"){
 
-if(available<q){
+stockField=pack==="20"?"cartons20":"cartons30";
 
-$("message").textContent="Yeterli koli stoğu yok.";
+}else{
+
+stockField=pack==="20"?"packaged20":"packaged30";
+
+}
+
+if(p[stockField]===undefined){
+
+p[stockField]=0;
+
+}
+
+if(kind==="out" && p[stockField]<q){
+
+$("message").textContent="Yeterli stok yok.";
 
 return;
 
 }
 
-}
-
-if(pack==="20"){
-
-p.cartons20+=kind==="in"?q:-q;
-
-}
-
-if(pack==="30"){
-
-p.cartons30+=kind==="in"?q:-q;
-
-}
+p[stockField]+=kind==="in"?q:-q;
 
 p.stock+=kind==="in"?total:-total;
 
@@ -362,6 +376,8 @@ kind:kind,
 qty:total,
 
 product:p.name,
+
+packageType:packageType,
 
 package:pack,
 
