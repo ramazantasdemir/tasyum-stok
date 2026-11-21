@@ -59,6 +59,7 @@ nav button{font-size:13px;padding:12px 4px}
 .hidden{display:none}
 
 </style>
+<link rel="manifest" href="./manifest.json">
 
 </head>
 
@@ -291,7 +292,19 @@ let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="t
 function tick(){$("clock").textContent=new Date().toLocaleString("tr-TR")}
 
 tick();setInterval(tick,1000);
+if ("serviceWorker" in navigator) {
 
+  window.addEventListener("load", () => {
+
+    navigator.serviceWorker.register("./service-worker.js")
+
+      .then(() => console.log("TAŞYUM STOK çevrimdışı hazır"))
+
+      .catch(error => console.log("Çevrimdışı kayıt hatası:", error));
+
+  });
+
+}
 </script>
 
 </body>
