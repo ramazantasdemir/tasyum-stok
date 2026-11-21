@@ -1,0 +1,299 @@
+
+
+<!DOCTYPE html>
+
+<html lang="tr">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="theme-color" content="#101827">
+
+<title>TAŞYUM STOK</title>
+
+<style>
+
+*{box-sizing:border-box}
+
+body{margin:0;background:#101827;color:#f5f1e8;font-family:Arial,sans-serif}
+
+header{padding:22px 18px;background:#172338;border-bottom:1px solid #b9974b}
+
+h1{margin:0;color:#d6b45e;font-size:25px;letter-spacing:2px}
+
+header p{margin:7px 0 0;color:#b9c2d0;font-size:13px}
+
+main{padding:16px;max-width:650px;margin:auto}
+
+.card{background:#1b2a40;border:1px solid #34445a;border-radius:14px;padding:16px;margin-bottom:14px}
+
+h2{font-size:17px;color:#e0c16d;margin:0 0 13px}
+
+input,select,button{width:100%;padding:13px;margin:6px 0;border-radius:9px;border:1px solid #53627a;background:#101827;color:white;font-size:15px}
+
+button{background:#b9974b;color:#101827;font-weight:bold;border:0}
+
+button.secondary{background:#34445a;color:white}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+.stat{background:#101827;border-radius:10px;padding:13px}
+
+.stat small{color:#aeb9c9}
+
+.stat strong{display:block;color:#e0c16d;font-size:22px;margin-top:7px}
+
+.product{padding:12px;border-bottom:1px solid #405069}
+
+.product strong{color:#e0c16d}
+
+.muted{color:#aeb9c9;font-size:13px}
+
+nav{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:15px}
+
+nav button{font-size:13px;padding:12px 4px}
+
+.hidden{display:none}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h1>TAŞYUM STOK</h1>
+
+<p>Yumurta stok ve satış takip sistemi</p>
+
+</header>
+
+<main>
+
+<section id="lock" class="card">
+
+<h2>Güvenli Giriş</h2>
+
+<p class="muted">İlk kullanımda 10 haneli PIN belirleyin.</p>
+
+<input id="pin" type="password" inputmode="numeric" maxlength="10" placeholder="10 haneli PIN">
+
+<label class="muted"><input id="remember" type="checkbox" style="width:auto"> Beni Hatırla</label>
+
+<button onclick="login()">Giriş / PIN Oluştur</button>
+
+<p id="lockMsg" class="muted"></p>
+
+</section>
+
+<section id="app" class="hidden">
+
+<div class="card">
+
+<div id="clock" class="muted"></div>
+
+<h2>Genel Durum</h2>
+
+<div class="grid">
+
+<div class="stat"><small>Toplam stok (adet)</small><strong id="total">0</strong></div>
+
+<div class="stat"><small>Günlük satış (adet)</small><strong id="daily">0</strong></div>
+
+</div>
+
+</div>
+
+<nav>
+
+<button onclick="show('home')">Ana Sayfa</button>
+
+<button onclick="show('products')">Ürünler</button>
+
+<button onclick="show('movement')">Alış / Satış</button>
+
+</nav>
+
+<div id="home" class="card">
+
+<h2>TAŞYUM STOK</h2>
+
+<p class="muted">Kendi telefonunda saklanan kayıt sistemi.</p>
+
+<p class="muted">Verilerinizi düzenli olarak yedekleyin.</p>
+
+</div>
+
+<div id="products" class="card hidden">
+
+<h2>Ürün Tanımlama</h2>
+
+<input id="pname" placeholder="Ürün adı (Örn. KLAVUZ)">
+
+<button onclick="addProduct()">Ürün Ekle</button>
+
+<div id="productList"></div>
+
+</div>
+
+<div id="movement" class="card hidden">
+
+<h2>Stok Alış / Satış</h2>
+
+<select id="which"></select>
+
+<select id="kind">
+
+<option value="in">Alış (Stok artırır)</option>
+
+<option value="out">Satış (Stok azaltır)</option>
+
+</select>
+
+<input id="qty" type="number" min="1" placeholder="Adet">
+
+<select id="package">
+
+<option value="loose">Açık yumurta</option>
+
+<option value="20">20'li koli</option>
+
+<option value="30">30'lu koli</option>
+
+</select>
+
+<button onclick="moveStock()">İşlemi Kaydet</button>
+
+<p id="message" class="muted"></p>
+
+</div>
+
+<div class="card">
+
+<h2>Veri Yedekleme</h2>
+
+<button class="secondary" onclick="backup()">Yedek indir</button>
+
+</div>
+
+</section>
+
+</main>
+
+<script>
+
+const $=id=>document.getElementById(id);
+
+let data=JSON.parse(localStorage.getItem("tasyumData")||'{"products":[],"moves":[]}');
+
+function save(){localStorage.setItem("tasyumData",JSON.stringify(data));render()}
+
+function login(){
+
+let p=$("pin").value;
+
+if(!/^[0-9]{10}$/.test(p)){ $("lockMsg").textContent="PIN tam 10 rakam olmalı.";return}
+
+let saved=localStorage.getItem("tasyumPin");
+
+if(!saved){localStorage.setItem("tasyumPin",p)}
+
+else if(saved!==p){$("lockMsg").textContent="PIN yanlış.";return}
+
+$("lock").classList.add("hidden");$("app").classList.remove("hidden");render();
+
+}
+
+function show(id){
+
+["home","products","movement"].forEach(x=>$(x).classList.toggle("hidden",x!==id));
+
+}
+
+function addProduct(){
+
+let n=$("pname").value.trim().toLocaleUpperCase("tr-TR");
+
+if(!n)return;
+
+if(data.products.some(p=>p.name===n)){alert("Bu ürün zaten kayıtlı.");return}
+
+data.products.push({name:n,stock:0,loose:0,cartons20:0,cartons30:0});
+
+$("pname").value="";save();
+
+}
+
+function moveStock(){
+
+let i=Number($("which").value),q=Number($("qty").value),kind=$("kind").value,pack=$("package").value;
+
+if(!data.products[i]||!Number.isInteger(q)||q<1){$("message").textContent="Ürün ve geçerli adet girin.";return}
+
+let p=data.products[i],eggs=pack==="20"?20:pack==="30"?30:1,total=q*eggs;
+
+if(kind==="out"&&p.stock<total){$("message").textContent="Yeterli stok yok.";return}
+
+p.stock+=kind==="in"?total:-total;
+
+if(pack==="20")p.cartons20+=kind==="in"?q:-q;
+
+if(pack==="30")p.cartons30+=kind==="in"?q:-q;
+
+if(pack==="loose")p.loose+=kind==="in"?q:-q;
+
+data.moves.push({date:new Date().toISOString(),kind,qty:total,product:p.name});
+
+$("qty").value="";$("message").textContent="İşlem kaydedildi.";save();
+
+}
+
+function render(){
+
+$("productList").innerHTML="";
+
+$("which").innerHTML="";
+
+data.products.forEach((p,i)=>{
+
+let d=document.createElement("div");d.className="product";
+
+d.innerHTML="<strong>"+escapeText(p.name)+"</strong><br><span class='muted'>Toplam: "+p.stock+" yumurta · Açık: "+p.loose+" · 20'li: "+p.cartons20+" · 30'lu: "+p.cartons30+"</span>";
+
+$("productList").appendChild(d);
+
+let o=document.createElement("option");o.value=i;o.textContent=p.name;$("which").appendChild(o);
+
+});
+
+$("total").textContent=data.products.reduce((s,p)=>s+p.stock,0);
+
+let today=new Date().toDateString();
+
+$("daily").textContent=data.moves.filter(m=>m.kind==="out"&&new Date(m.date).toDateString()===today).reduce((s,m)=>s+m.qty,0);
+
+}
+
+function escapeText(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+function backup(){
+
+let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+
+let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="tasyum-yedek.json";a.click();URL.revokeObjectURL(a.href);
+
+}
+
+function tick(){$("clock").textContent=new Date().toLocaleString("tr-TR")}
+
+tick();setInterval(tick,1000);
+
+</script>
+
+</body>
+
+</html>
