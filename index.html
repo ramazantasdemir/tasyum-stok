@@ -295,27 +295,97 @@ alert("Ürün ve başlangıç stokları kaydedildi.");
 
 }
 
+
+
 function moveStock(){
 
-let i=Number($("which").value),q=Number($("qty").value),kind=$("kind").value,pack=$("package").value;
+let i=Number($("which").value);
 
-if(!data.products[i]||!Number.isInteger(q)||q<1){$("message").textContent="Ürün ve geçerli adet girin.";return}
+let q=Number($("qty").value);
 
-let p=data.products[i],eggs=pack==="20"?20:pack==="30"?30:1,total=q*eggs;
+let kind=$("kind").value;
 
-if(kind==="out"&&p.stock<total){$("message").textContent="Yeterli stok yok.";return}
+let pack=$("package").value;
+
+if(!data.products[i]||!Number.isInteger(q)||q<1){
+
+$("message").textContent="Ürün ve geçerli miktar girin.";
+
+return;
+
+}
+
+let p=data.products[i];
+
+if(pack==="loose" && kind==="out" && p.loose<q){
+
+$("message").textContent="Yeterli açık yumurta yok.";
+
+return;
+
+}
+
+if(pack==="20" && kind==="out" && p.cartons20<q){
+
+$("message").textContent="Yeterli 20'li koli yok.";
+
+return;
+
+}
+
+if(pack==="30" && kind==="out" && p.cartons30<q){
+
+$("message").textContent="Yeterli 30'lu koli yok.";
+
+return;
+
+}
+
+let eggs=pack==="20"?20:pack==="30"?30:1;
+
+let total=q*eggs;
+
+if(pack==="loose"){
+
+p.loose+=kind==="in"?q:-q;
+
+}
+
+if(pack==="20"){
+
+p.cartons20+=kind==="in"?q:-q;
+
+}
+
+if(pack==="30"){
+
+p.cartons30+=kind==="in"?q:-q;
+
+}
 
 p.stock+=kind==="in"?total:-total;
 
-if(pack==="20")p.cartons20+=kind==="in"?q:-q;
+data.moves.push({
 
-if(pack==="30")p.cartons30+=kind==="in"?q:-q;
+date:new Date().toISOString(),
 
-if(pack==="loose")p.loose+=kind==="in"?q:-q;
+kind:kind,
 
-data.moves.push({date:new Date().toISOString(),kind,qty:total,product:p.name});
+qty:total,
 
-$("qty").value="";$("message").textContent="İşlem kaydedildi.";save();
+product:p.name,
+
+package:pack,
+
+packageCount:q
+
+});
+
+$("qty").value="";
+
+$("message").textContent="İşlem başarıyla kaydedildi.";
+
+save();
 
 }
 
