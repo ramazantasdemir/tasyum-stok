@@ -405,6 +405,25 @@ save();
 
 }
 
+
+function deleteProduct(index){
+
+let p=data.products[index];
+
+if(!p)return;
+
+if(!confirm('"'+p.name+'" ürünü silinsin mi? Eski alış ve satış geçmişi korunacaktır.')){
+
+return;
+
+}
+
+data.products.splice(index,1);
+
+save();
+
+}
+  
 function render(){
 
 $("productList").innerHTML="";
@@ -419,6 +438,16 @@ let d=document.createElement("div");d.className="product";
 
 d.innerHTML="<strong>"+escapeText(p.name)+"</strong><br><span class='muted'>Toplam: "+p.stock+" yumurta · Açık: "+p.loose+" · Koli 20'li: "+p.cartons20+" · Koli 30'lu: "+p.cartons30+" · Paketli 20'li: "+(p.packaged20||0)+" · Paketli 30'lu: "+(p.packaged30||0)+"</span>";
 
+
+let del=document.createElement("button");
+
+del.textContent="Ürünü Sil";
+
+del.className="secondary";
+
+del.onclick=()=>deleteProduct(i);
+
+d.appendChild(del);
 $("productList").appendChild(d);
 
 let o=document.createElement("option");o.value=i;o.textContent=p.name;$("which").appendChild(o);
