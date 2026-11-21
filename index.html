@@ -135,9 +135,25 @@ nav button{font-size:13px;padding:12px 4px}
 
 <input id="pname" placeholder="Ürün adı (Örn. KLAVUZ)">
 
-<button onclick="addProduct()">Ürün Ekle</button>
+<p class="muted">Başlangıç stok miktarları</p>
+
+<label class="muted">Açık yumurta adedi</label>
+
+<input id="pLoose" type="number" min="0" value="0" placeholder="Açık yumurta">
+
+<label class="muted">20'li koli sayısı</label>
+
+<input id="p20" type="number" min="0" value="0" placeholder="20'li koli">
+
+<label class="muted">30'lu koli sayısı</label>
+
+<input id="p30" type="number" min="0" value="0" placeholder="30'lu koli">
+
+<button onclick="addProduct()">Ürünü Kaydet</button>
 
 <div id="productList"></div>
+
+</div>
 
 </div>
 
@@ -215,19 +231,7 @@ function show(id){
 
 }
 
-function addProduct(){
 
-let n=$("pname").value.trim().toLocaleUpperCase("tr-TR");
-
-if(!n)return;
-
-if(data.products.some(p=>p.name===n)){alert("Bu ürün zaten kayıtlı.");return}
-
-data.products.push({name:n,stock:0,loose:0,cartons20:0,cartons30:0});
-
-$("pname").value="";save();
-
-}
 
 function moveStock(){
 
