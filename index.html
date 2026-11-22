@@ -204,6 +204,13 @@ nav button{font-size:13px;padding:12px 4px}
 
 <h2>Stok Hareketleri Geçmişi</h2>
 
+<select id="historyProduct" onchange="render()">
+
+<option value="">Tüm Ürünler</option>
+
+</select>
+
+<input id="historyDate" type="date" onchange="render()" placeholder="Tarih seçin">
 <button class="secondary" onclick="undoLastMove()">Son İşlemi Geri Al</button>
 <div id="historyList">
 
@@ -519,12 +526,55 @@ let o=document.createElement("option");o.value=i;o.textContent=p.name;$("which")
 
 });
 
+let historyProduct=$("historyProduct");
+
+let selectedHistoryProduct=historyProduct.value;
+
+historyProduct.innerHTML='<option value="">Tüm Ürünler</option>';
+
+data.products.forEach(p=>{
+
+let option=document.createElement("option");
+
+option.value=p.name;
+
+option.textContent=p.name;
+
+historyProduct.appendChild(option);
+
+});
+
+historyProduct.value=selectedHistoryProduct;
 $("total").textContent=data.products.reduce((s,p)=>s+(p.cartons20||0)+(p.cartons30||0)+(p.packaged20||0)+(p.packaged30||0),0);
 
 
 $("historyList").innerHTML="";
 
-data.moves.slice().reverse().forEach(m=>{
+let selectedProduct=$("historyProduct").value;
+
+let selectedDate=$("historyDate").value;
+
+data.moves
+
+.filter(m=>{
+
+let productMatch=!selectedProduct || m.product===selectedProduct;
+
+let d=new Date(m.date);
+
+let moveDate=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+
+let dateMatch=!selectedDate || moveDate===selectedDate;
+
+return productMatch && dateMatch;
+
+})
+
+.slice()
+
+.reverse()
+
+.forEach(m=>{
 
 let type=m.packageType==="packaged"?"Paketli":"Koli";
 
