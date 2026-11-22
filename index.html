@@ -423,7 +423,69 @@ data.products.splice(index,1);
 save();
 
 }
-  
+ function undoLastMove(){
+
+if(data.moves.length===0){
+
+alert("Geri alınacak işlem bulunamadı.");
+
+return;
+
+}
+
+let m=data.moves[data.moves.length-1];
+
+let p=data.products.find(x=>x.name===m.product);
+
+if(!p){
+
+alert("Bu işlemin ürünü bulunamadı.");
+
+return;
+
+}
+
+if(!confirm("Son işlem geri alınsın mı?\n"+m.product+" - "+(m.kind==="in"?"ALIŞ":"SATIŞ"))){
+
+return;
+
+}
+
+let field;
+
+if(m.packageType==="carton"){
+
+field=m.package==="20"?"cartons20":"cartons30";
+
+}else{
+
+field=m.package==="20"?"packaged20":"packaged30";
+
+}
+
+let count=m.packageCount||Math.round(m.qty/(m.package==="20"?20:30));
+
+if(m.kind==="in"){
+
+p[field]-=count;
+
+p.stock-=m.qty;
+
+}else{
+
+p[field]+=count;
+
+p.stock+=m.qty;
+
+}
+
+data.moves.pop();
+
+save();
+
+alert("Son işlem geri alındı.");
+
+} 
 function render(){
 
 $("productList").innerHTML="";
