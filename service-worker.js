@@ -1,6 +1,6 @@
 
 
-const CACHE_NAME = "tasyum-stok-v2";
+const CACHE_NAME = "tasyum-stok-v3";
 
 const FILES_TO_CACHE = [
 
