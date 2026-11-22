@@ -456,7 +456,7 @@ let o=document.createElement("option");o.value=i;o.textContent=p.name;$("which")
 
 });
 
-$("total").textContent=data.products.reduce((s,p)=>s+p.stock,0);
+$("total").textContent=data.products.reduce((s,p)=>s+(p.cartons20||0)+(p.cartons30||0)+(p.packaged20||0)+(p.packaged30||0),0);
 
 
 $("historyList").innerHTML="";
